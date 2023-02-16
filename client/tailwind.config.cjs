@@ -2,7 +2,11 @@ const config = {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 
 	theme: {
-		extend: {}
+		extend: {
+			colors: {
+				'simpsons-yellow': '#ffde00'
+			}
+		}
 	},
 
 	plugins: []
