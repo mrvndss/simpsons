@@ -35,4 +35,43 @@ class AuthController extends Controller
             'user' => $user
         ], 201);
     }
+
+    public function login(Request $request)
+    {
+        // define the validation rules and validate the request
+        $rules = [
+            'email' => 'required|string|email',
+            'password' => 'required|string'
+        ];
+
+        $this->validate($request, $rules);
+
+        // check if the user exists
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        // check if the password is correct
+        if (!app('hash')->check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        // generate a new api token for the user
+        $token = Str::random(80);
+
+        $user->update([
+            'api_token' => $token
+        ]);
+
+        return response()->json([
+            'message' => 'User logged in successfully',
+            'user' => $user
+        ], 200);
+    }
 }
