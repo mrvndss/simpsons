@@ -51,14 +51,14 @@ class AuthController extends Controller
 
         if (!$user) {
             return response()->json([
-                'message' => 'Invalid credentials'
+                'message' => 'Invalid credentials or user does not exist'
             ], 401);
         }
 
         // check if the password is correct
         if (!app('hash')->check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'Invalid credentials'
+                'message' => 'Invalid credentials or user does not exist'
             ], 401);
         }
 
@@ -71,6 +71,23 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'User logged in successfully',
+            'user' => $user
+        ], 200);
+    }
+
+    public function validateToken(Request $request, $token)
+    {
+        // check if user with given token exists
+        $user = User::where('api_token', $token)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Invalid token or user does not exist'
+            ], 401);
+        }
+
+        return response()->json([
+            'message' => 'Token is valid',
             'user' => $user
         ], 200);
     }
