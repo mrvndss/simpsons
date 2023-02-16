@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 
-class ExampleMiddleware
+class ApiTokenMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,6 +16,12 @@ class ExampleMiddleware
      */
     public function handle($request, Closure $next)
     {
+        // check if the given token is valid
+        $user = User::where('api_token', $request->header('Authorization'))->first();
+        if (!$user) {
+            return response()->json('Unauthorized', 401);
+        }
+
         return $next($request);
     }
 }
