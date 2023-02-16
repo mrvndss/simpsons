@@ -9,8 +9,8 @@ class QuoteService
 {
     public function getQuotes()
     {
-        $quote = $this->getQuoteFromApi();
-        $quotes = Quote::all();
+        $this->getQuoteFromApi();
+        $quotes = Quote::orderBy('created_at', 'desc')->get();
 
         // If we have more than 5 quotes, delete the oldest one
         if ($quotes->count() >= 5) {
