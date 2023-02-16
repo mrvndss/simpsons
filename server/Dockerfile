@@ -7,10 +7,9 @@ ARG user=lumen
 WORKDIR /var/www
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    zip \
-    && docker-php-ext-install zip pdo_mysql
+RUN apt-get update && apt-get install -y libpq-dev \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo pdo_pgsql pgsql
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
