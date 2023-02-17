@@ -3,11 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\TokenService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    protected $tokenService;
+
+    public function __construct()
+    {
+        $this->tokenService = new TokenService();
+    }
 
     public function register(Request $request)
     {
@@ -20,14 +27,11 @@ class AuthController extends Controller
 
         $this->validate($request, $rules);
 
-        // generate a new api token for the user
-        $token = Str::random(80);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => app('hash')->make($request->password),
-            'api_token' => $token
+            'api_token' => $this->tokenService->generateToken(),
         ]);
 
         return response()->json([
@@ -62,11 +66,8 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // generate a new api token for the user
-        $token = Str::random(80);
-
         $user->update([
-            'api_token' => $token
+            'api_token' => $this->tokenService->generateToken(),
         ]);
 
         return response()->json([
