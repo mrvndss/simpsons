@@ -1,4 +1,3 @@
-# Base image
 FROM php:8.1-cli
 
 ARG user=lumen
