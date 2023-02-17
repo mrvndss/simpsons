@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\TokenService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    protected $userService;
     protected $tokenService;
 
     public function __construct()
     {
+        $this->userService = new UserService();
         $this->tokenService = new TokenService();
     }
 
@@ -27,16 +29,9 @@ class AuthController extends Controller
 
         $this->validate($request, $rules);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => app('hash')->make($request->password),
-            'api_token' => $this->tokenService->generateToken(),
-        ]);
-
         return response()->json([
             'message' => 'User created successfully',
-            'user' => $user
+            'user' => $this->userService->createUser($request->name, $request->email, $request->password)
         ], 201);
     }
 
@@ -51,7 +46,7 @@ class AuthController extends Controller
         $this->validate($request, $rules);
 
         // check if the user exists
-        $user = User::where('email', $request->email)->first();
+        $user = $this->userService->checkIfUserExists($request->email);
 
         if (!$user) {
             return response()->json([
@@ -60,7 +55,7 @@ class AuthController extends Controller
         }
 
         // check if the password is correct
-        if (!app('hash')->check($request->password, $user->password)) {
+        if (!$this->userService->validatePassword($request->password, $user)) {
             return response()->json([
                 'message' => 'Invalid credentials or user does not exist'
             ], 401);
@@ -76,7 +71,7 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function validateToken(Request $request, $token)
+    public function validateToken($token)
     {
         // check if user with given token exists
         $user = User::where('api_token', $token)->first();
