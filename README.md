@@ -4,6 +4,7 @@
 
 - [SvelteKit](https://github.com/sveltejs/kit)
 - [Lumen](https://github.com/laravel/lumen)
+- [tailwindcss](https://github.com/tailwindlabs/tailwindcss)
 
 ## Getting started
 
